@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Expense Tracker</title>
+
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f1f3f6;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            color: #333;
+        }
+
+        h1 {
+            text-align: center;
+            color: #00796b;
+            font-size: 2.5rem;
+            margin-top: 20px;
+        }
+
+        /* FORM */
+        #expense-form {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            margin-top: 20px;
+            display: flex;
+            gap: 10px;
+            width: 90%;
+            max-width: 1000px;
+            flex-wrap: wrap;
+        }
+
+        #expense-form input,
+        #expense-form select,
+        #expense-form button {
+            padding: 12px;
+            border-radius: 6px;
+            border: 1px solid #ddd;
+            font-size: 1rem;
+            flex: 1;
+            min-width: 140px;
+        }
+
+        #expense-form button {
+            background-color: #4CAF50;
+            color: white;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        #expense-form button:hover {
+            background-color: #45a049;
+        }
+
+        /* TABLE */
+        table {
+            width: 90%;
+            max-width: 1000px;
+            margin-top: 30px;
+            border-collapse: collapse;
+            background-color: #fff;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 14px;
+            text-align: center;
+            font-size: 1.1rem;
+        }
+
+        th {
+            background-color: #00796b;
+            color: white;
+            font-weight: bold;
+        }
+
+        tfoot {
+            background-color: #00796b;
+            color: white;
+            font-weight: bold;
+        }
+
+        tbody tr:hover {
+            background-color: #f1f1f1;
+        }
+
+    </style>
+</head>
+<body>
+
+    <h1>Expense Tracker</h1>
+
+    <form id="expense-form">
+        <input type="number" id="amount" placeholder="Amount">
+        
+        <select id="currency">
+            <option value="USD">USD</option>
+            <option value="EUR">EUR</option>
+            <option value="EGP">EGP</option>
+        </select>
+
+        <select id="category">
+            <option value="life">Life Expenses</option>
+            <option value="gas">Gas</option>
+            <option value="rental">Rental</option>
+            <option value="grocery">Grocery</option>
+        </select>
+
+        <input type="date" id="date">
+
+        <select id="payment-method">
+            <option value="Cash">Cash</option>
+            <option value="Credit Card">Credit Card</option>
+            <option value="Paypal">Paypal</option>
+        </select>
+
+        <button type="button" id="add-expense">Add Expense</button>
+    </form>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Amount</th>
+                <th>Currency</th>
+                <th>Category</th>
+                <th>Date</th>
+                <th>Payment Method</th>
+            </tr>
+        </thead>
+
+        <tbody id="expense-body"></tbody>
+
+        <tfoot>
+            <tr>
+                <td colspan="4">Total (USD):</td>
+                <td id="total-amount">0</td>
+            </tr>
+        </tfoot>
+    </table>
+
+    <script>
+        let expenses = [];
+        let totalAmount = 0;
+
+        const categorySelect = document.getElementById('category');
+        const amountInput = document.getElementById('amount');
+        const dateInput = document.getElementById('date');
+        const currencyInput = document.getElementById('currency');
+        const paymentMethod = document.getElementById('payment-method');
+        const addBtn = document.getElementById('add-expense');
+        const expenseTableBody = document.getElementById('expense-body');
+        const totalAmountCell = document.getElementById('total-amount');
+
+        addBtn.addEventListener('click', function () {
+
+            const currency = currencyInput.value;
+            const category = categorySelect.value;
+            const date = dateInput.value;
+            const amount = Number(amountInput.value);
+            const payment = paymentMethod.value;
+
+            const conversionRate =
+                currency === "EGP" ? 0.032 :
+                currency === "EUR" ? 1.1 :
+                1;
+
+            const amountInUSD = amount * conversionRate;
+
+            if (isNaN(amount) || amount <= 0) {
+                alert('Please enter a valid amount');
+                return;
+            }
+
+            if (date === '') {
+                alert('Please select a date');
+                return;
+            }
+
+            expenses.push({ amount, currency, category, date, payment, amountInUSD });
+
+            const newRow = `
+                <tr>
+                    <td>${amount}</td>
+                    <td>${currency}</td>
+                    <td>${category}</td>
+                    <td>${date}</td>
+                    <td>${payment}</td>
+                </tr>`;
+
+            expenseTableBody.innerHTML += newRow;
+
+            totalAmount += amountInUSD;
+            totalAmountCell.textContent = totalAmount.toFixed(2);
+
+            amountInput.value = "";
+            dateInput.value = "";
+        });
+    </script>
+
+</body>
+</html>
